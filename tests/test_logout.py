@@ -1,7 +1,8 @@
 import allure
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from conftest import driver, base_url
+from conftest import driver
+from data import BASE_URL, email, password
 
 from locators import *
 
@@ -9,11 +10,8 @@ from locators import *
 class TestLogout:
 
     @allure.title("Logout пользователя")
-    def test_logout_user(self, driver, base_url):
-        email = "burdakovavi@mail.ru"
-        password = "Btz9Yar29R!CCBx"
-
-        driver.get(base_url)
+    def test_logout_user(self, driver):
+        driver.get(BASE_URL)
 
         WebDriverWait(driver, 2).until(
             EC.element_to_be_clickable(MainPageLocators.BUTTON_ENTER_REGISTER)

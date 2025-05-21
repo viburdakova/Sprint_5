@@ -1,19 +1,18 @@
-import string
-import random
-
 import allure
-from selenium.common import StaleElementReferenceException
+
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from conftest import driver, base_url
+from conftest import driver
+from data import BASE_URL, email, password
+from helpers import description_text, price_value, title_text
 from locators import *
 
 
 class TestCreateAdvertisement:
 
     @allure.title("Создание объявления неавторизованным пользователем")
-    def test_ad_creation_by_unauthorized_user(self, driver, base_url):
-        driver.get(base_url)
+    def test_ad_creation_by_unauthorized_user(self, driver):
+        driver.get(BASE_URL)
 
         WebDriverWait(driver, 2).until(
             EC.element_to_be_clickable(MainPageLocators.BUTTON_POST_AD)
@@ -33,11 +32,8 @@ class TestCreateAdvertisement:
         )
 
     @allure.title("Создание объявления авторизованным пользователем")
-    def test_create_advertisement(self, driver, base_url):
-        email = "burdakovavi@mail.ru"
-        password = "Btz9Yar29R!CCBx"
-
-        driver.get(base_url)
+    def test_create_advertisement(self, driver):
+        driver.get(BASE_URL)
 
         WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable(MainPageLocators.BUTTON_ENTER_REGISTER)
@@ -57,18 +53,12 @@ class TestCreateAdvertisement:
             EC.element_to_be_clickable(MainPageLocators.BUTTON_LOGIN)
         ).click()
 
-        try:
-            WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located(MainPageLocators.BUTTON_POST_AD))
-            driver.find_element(*MainPageLocators.BUTTON_POST_AD).click()
-        except StaleElementReferenceException:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located(MainPageLocators.BUTTON_POST_AD))
-            driver.find_element(*MainPageLocators.BUTTON_POST_AD).click()
+        WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable(MainPageLocators.BUTTON_POST_AD)
+        )
 
-        title_text = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
-        description_text = ''.join(random.choices(string.ascii_letters + string.digits + ' ,.', k=50))
-        price_value = random.randint(500000, 1000000)
+        button_post_ad = driver.find_element(*MainPageLocators.BUTTON_POST_AD)
+        button_post_ad.click()
 
         driver.find_element(*CreateAdvertisement.AD_TITLE_INPUT).send_keys(title_text)
 
@@ -90,14 +80,7 @@ class TestCreateAdvertisement:
 
         driver.find_element(*MainPageLocators.BUTTON_PUBLISH).click()
 
-        try:
-            WebDriverWait(driver, 5).until(
-                EC.presence_of_element_located(MainPageLocators.PROFILE_AVATAR))
-            driver.find_element(*MainPageLocators.PROFILE_AVATAR).click()
-        except StaleElementReferenceException:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located(MainPageLocators.PROFILE_AVATAR))
-            driver.find_element(*MainPageLocators.PROFILE_AVATAR).click()
+        driver.find_element(*MainPageLocators.PROFILE_AVATAR).click()
 
         wait = WebDriverWait(driver, 10)
         advertisement = wait.until(
